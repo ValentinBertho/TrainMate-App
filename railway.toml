@@ -1,0 +1,9 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm install --no-audit --no-fund && npm run build"
+
+[variables]
+NODE_VERSION = "22"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
