@@ -10,7 +10,7 @@ export default defineConfig({
       manifest: {
         name: 'TrainMate',
         short_name: 'TrainMate',
-        description: 'Ton coach running & vélo',
+        description: 'Ton coach course & vélo',
         theme_color: '#3b82f6',
         background_color: '#ffffff',
         display: 'standalone',
@@ -28,8 +28,5 @@ export default defineConfig({
         ]
       }
     })
-  ],
-  server: {
-    port: 5173
-  }
+  ]
 });

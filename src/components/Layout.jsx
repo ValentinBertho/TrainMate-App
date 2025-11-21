@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { Home, Calendar, BookOpen, User, LogOut } from 'lucide-react';
+import { Home, Calendar, BookOpen, User, Users, LogOut, Award } from 'lucide-react';
 
 export default function Layout() {
   const { user, logout } = useAuthStore();
@@ -11,12 +11,27 @@ export default function Layout() {
     navigate('/login');
   };
 
-  const navLinks = [
+  // Navigation différente selon le rôle
+  const isCoach = user?.role === 'Coach';
+
+  const athleteLinks = [
     { to: '/dashboard', icon: Home, label: 'Accueil' },
     { to: '/calendar', icon: Calendar, label: 'Calendrier' },
     { to: '/plans', icon: BookOpen, label: 'Plans' },
+    { to: '/groups', icon: Users, label: 'Groupes' },
+    { to: '/coaches', icon: Award, label: 'Coachs' },
     { to: '/profile', icon: User, label: 'Profil' }
   ];
+
+  const coachLinks = [
+    { to: '/coach/dashboard', icon: Home, label: 'Dashboard' },
+    { to: '/coach/groups', icon: Users, label: 'Mes Groupes' },
+    { to: '/my-groups', icon: Calendar, label: 'Mes Séances' },
+    { to: '/coaches', icon: Award, label: 'Coachs' },
+    { to: '/profile', icon: User, label: 'Profil' }
+  ];
+
+  const navLinks = isCoach ? coachLinks : athleteLinks;
 
   return (
     <div className="min-h-screen bg-gray-50">

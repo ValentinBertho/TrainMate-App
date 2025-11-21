@@ -1,9 +1,9 @@
-// src/pages/Dashboard.jsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { userPlansAPI } from '../lib/userPlans';
 import { sessionsAPI } from '../lib/sessions';
+import { groupsAPI } from '../lib/groups';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -15,17 +15,29 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  ArrowRight 
+  ArrowRight,
+  Users
 } from 'lucide-react';
 import { format, startOfWeek, addDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 export default function Dashboard() {
   const user = useAuthStore(state => state.user);
+  const navigate = useNavigate();
+  
+  // Rediriger les coachs vers leur dashboard spécifique
+  useEffect(() => {
+    if (user?.role === 'Coach') {
+      navigate('/coach/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
+
   const [loading, setLoading] = useState(true);
   const [activePlan, setActivePlan] = useState(null);
   const [weekSummary, setWeekSummary] = useState(null);
   const [upcomingSessions, setUpcomingSessions] = useState([]);
+  const [myGroups, setMyGroups] = useState([]);
+  const [groupSessions, setGroupSessions] = useState([]);
 
   useEffect(() => {
     loadDashboardData();
@@ -39,7 +51,6 @@ export default function Dashboard() {
         const plan = await userPlansAPI.getActive();
         setActivePlan(plan);
       } catch (err) {
-        // Pas de plan actif
         setActivePlan(null);
       }
 
@@ -48,11 +59,27 @@ export default function Dashboard() {
       const summary = await sessionsAPI.getWeekSummary(weekStart);
       setWeekSummary(summary);
 
-      // Prochaines séances (7 jours)
+      // Prochaines séances perso (7 jours)
       const today = new Date();
       const nextWeek = addDays(today, 7);
       const sessions = await sessionsAPI.getCalendar(today, nextWeek);
       setUpcomingSessions(sessions.filter(s => s.status === 'Planned').slice(0, 3));
+
+      // Mes groupes
+      try {
+        const groups = await groupsAPI.getMyGroups();
+        setMyGroups(groups.slice(0, 3));
+      } catch (err) {
+        setMyGroups([]);
+      }
+
+      // Prochaines séances de groupe
+      try {
+        const gSessions = await groupsAPI.getUpcomingSessions();
+        setGroupSessions(gSessions.slice(0, 3));
+      } catch (err) {
+        setGroupSessions([]);
+      }
 
     } catch (err) {
       console.error('Error loading dashboard:', err);

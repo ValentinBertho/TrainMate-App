@@ -1,4 +1,3 @@
-// src/components/Input.jsx
 export function Input({ label, error, ...props }) {
   return (
     <div className="space-y-1">
